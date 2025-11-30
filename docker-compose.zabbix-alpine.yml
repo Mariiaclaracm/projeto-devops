@@ -1,0 +1,55 @@
+services:
+  zabbix-server:
+    image: zabbix/zabbix-server-mysql:alpine-6.0-latest
+    container_name: zabbix_server
+    environment:
+      DB_SERVER_HOST: zabbix-mysql
+      MYSQL_DATABASE: zabbix
+      MYSQL_USER: zabbix
+      MYSQL_PASSWORD: zabbix_password
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "10051:10051"
+    networks:
+      - zabbix_network
+    depends_on:
+      - zabbix-mysql
+
+  zabbix-mysql:
+    image: mysql:8.0
+    container_name: zabbix_mysql
+    environment:
+      MYSQL_DATABASE: zabbix
+      MYSQL_USER: zabbix
+      MYSQL_PASSWORD: zabbix_password
+      MYSQL_ROOT_PASSWORD: root_password
+    networks:
+      - zabbix_network
+    volumes:
+      - zabbix_mysql_data:/var/lib/mysql
+
+  zabbix-web:
+    image: zabbix/zabbix-web-nginx-mysql:alpine-6.0-latest
+    container_name: zabbix_web
+    environment:
+      DB_SERVER_HOST: zabbix-mysql
+      MYSQL_DATABASE: zabbix
+      MYSQL_USER: zabbix
+      MYSQL_PASSWORD: zabbix_password
+      MYSQL_ROOT_PASSWORD: root_password
+      ZBX_SERVER_HOST: zabbix-server
+      PHP_TZ: "America/Sao_Paulo"
+    ports:
+      - "8080:8080"
+    networks:
+      - zabbix_network
+    depends_on:
+      - zabbix-mysql
+      - zabbix-server
+
+volumes:
+  zabbix_mysql_data:
+
+networks:
+  zabbix_network:
+    driver: bridge
