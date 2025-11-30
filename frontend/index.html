@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projeto DevOps - Frontend</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            min-height: 100vh; 
+            padding: 20px; 
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white; 
+            border-radius: 10px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+            overflow: hidden; 
+        }
+        header { 
+            background: #2c3e50; 
+            color: white; 
+            padding: 2rem; 
+            text-align: center; 
+        }
+        header h1 { 
+            margin-bottom: 0.5rem; 
+            font-size: 2.5rem; 
+        }
+        .subtitle { 
+            color: #ecf0f1; 
+            font-size: 1.1rem; 
+        }
+        .main-content { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 2rem; 
+            padding: 2rem; 
+        }
+        @media (max-width: 768px) { 
+            .main-content { 
+                grid-template-columns: 1fr; 
+            } 
+        }
+        .form-section, .data-section { 
+            background: #f8f9fa; 
+            padding: 1.5rem; 
+            border-radius: 8px; 
+            border: 1px solid #e9ecef; 
+        }
+        h2 { 
+            color: #2c3e50; 
+            margin-bottom: 1rem; 
+            border-bottom: 2px solid #3498db; 
+            padding-bottom: 0.5rem; 
+        }
+        .form-group { 
+            margin-bottom: 1rem; 
+        }
+        label { 
+            display: block; 
+            margin-bottom: 0.5rem; 
+            font-weight: 600; 
+            color: #495057; 
+        }
+        input { 
+            width: 100%; 
+            padding: 0.75rem; 
+            border: 1px solid #ced4da; 
+            border-radius: 4px; 
+            font-size: 1rem; 
+        }
+        input:focus { 
+            outline: none; 
+            border-color: #3498db; 
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2); 
+        }
+        .btn { 
+            background: #3498db; 
+            color: white; 
+            border: none; 
+            padding: 0.75rem 1.5rem; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 1rem; 
+            font-weight: 600; 
+            transition: background 0.3s ease; 
+            margin-right: 0.5rem;
+        }
+        .btn:hover { 
+            background: #2980b9; 
+        }
+        .btn-danger { 
+            background: #e74c3c; 
+        }
+        .btn-danger:hover { 
+            background: #c0392b; 
+        }
+        .btn-success { 
+            background: #27ae60; 
+        }
+        .btn-success:hover { 
+            background: #219a52; 
+        }
+        .users-list { 
+            max-height: 400px; 
+            overflow-y: auto; 
+            margin-top: 1rem;
+        }
+        .user-card { 
+            background: white; 
+            border: 1px solid #dee2e6; 
+            border-radius: 6px; 
+            padding: 1rem; 
+            margin-bottom: 1rem; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+        }
+        .user-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 0.5rem; 
+        }
+        .user-name { 
+            font-weight: bold; 
+            color: #2c3e50; 
+            font-size: 1.1rem; 
+        }
+        .user-email { 
+            color: #7f8c8d; 
+            margin-bottom: 0.5rem; 
+        }
+        .user-actions { 
+            display: flex; 
+            gap: 0.5rem; 
+        }
+        .status { 
+            padding: 0.5rem; 
+            border-radius: 4px; 
+            text-align: center; 
+            margin-top: 1rem; 
+            font-weight: 600; 
+        }
+        .status.success { 
+            background: #d4edda; 
+            color: #155724; 
+            border: 1px solid #c3e6cb; 
+        }
+        .status.error { 
+            background: #f8d7da; 
+            color: #721c24; 
+            border: 1px solid #f5c6cb; 
+        }
+        .loading { 
+            text-align: center; 
+            color: #6c757d; 
+            font-style: italic; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Projeto DevOps</h1>
+            <p class="subtitle">Sistema de Gerenciamento de Usuários</p>
+        </header>
+
+        <div class="main-content">
+            <div class="form-section">
+                <h2>Adicionar/Editar Usuário</h2>
+                <form id="userForm">
+                    <input type="hidden" id="userId">
+                    <div class="form-group">
+                        <label for="name">Nome:</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <button type="submit" class="btn btn-success" id="submitBtn">Adicionar Usuário</button>
+                    <button type="button" class="btn" id="cancelBtn" style="display: none; background: #6c757d;">Cancelar</button>
+                </form>
+                <div id="formStatus"></div>
+            </div>
+
+            <div class="data-section">
+                <h2>Lista de Usuários</h2>
+                <button class="btn" onclick="loadUsers()">🔄 Atualizar Lista</button>
+                <div class="users-list" id="usersList">
+                    <div class="loading">Carregando usuários...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000/api';
+        const userForm = document.getElementById('userForm');
+        const usersList = document.getElementById('usersList');
+        const formStatus = document.getElementById('formStatus');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        let editingUserId = null;
+
+        // Carregar usuários quando a página carregar
+        document.addEventListener('DOMContentLoaded', loadUsers);
+
+        // Enviar formulário
+        userForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const userData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value
+            };
+
+            try {
+                let response;
+                if (editingUserId) {
+                    // Atualizar usuário existente
+                    response = await fetch(`${API_BASE_URL}/users/${editingUserId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(userData)
+                    });
+                } else {
+                    // Criar novo usuário
+                    response = await fetch(`${API_BASE_URL}/users`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(userData)
+                    });
+                }
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showStatus('Operação realizada com sucesso!', 'success');
+                    userForm.reset();
+                    cancelEdit();
+                    loadUsers();
+                } else {
+                    showStatus(`Erro: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showStatus('Erro de conexão com o servidor', 'error');
+            }
+        });
+
+        // Cancelar edição
+        cancelBtn.addEventListener('click', cancelEdit);
+
+        // Carregar lista de usuários
+        async function loadUsers() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/users`);
+                const result = await response.json();
+
+                if (response.ok) {
+                    displayUsers(result.data);
+                } else {
+                    usersList.innerHTML = '<div class="status error">Erro ao carregar usuários</div>';
+                }
+            } catch (error) {
+                usersList.innerHTML = '<div class="status error">Erro de conexão com o servidor</div>';
+            }
+        }
+
+        // Exibir usuários na lista
+        function displayUsers(users) {
+            if (users.length === 0) {
+                usersList.innerHTML = '<div class="loading">Nenhum usuário cadastrado</div>';
+                return;
+            }
+
+            usersList.innerHTML = users.map(user => `
+                <div class="user-card">
+                    <div class="user-header">
+                        <div class="user-name">${user.name}</div>
+                        <div class="user-actions">
+                            <button class="btn" onclick="editUser(${user.id}, '${user.name}', '${user.email}')">✏️</button>
+                            <button class="btn btn-danger" onclick="deleteUser(${user.id})">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="user-email">📧 ${user.email}</div>
+                    <div class="user-id">🆔 ${user.id}</div>
+                </div>
+            `).join('');
+        }
+
+        // Editar usuário
+        function editUser(id, name, email) {
+            document.getElementById('userId').value = id;
+            document.getElementById('name').value = name;
+            document.getElementById('email').value = email;
+            submitBtn.textContent = 'Atualizar Usuário';
+            cancelBtn.style.display = 'inline-block';
+            editingUserId = id;
+        }
+
+        // Cancelar edição
+        function cancelEdit() {
+            userForm.reset();
+            submitBtn.textContent = 'Adicionar Usuário';
+            cancelBtn.style.display = 'none';
+            editingUserId = null;
+        }
+
+        // Deletar usuário
+        async function deleteUser(id) {
+            if (!confirm('Tem certeza que deseja deletar este usuário?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/${id}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showStatus('Usuário deletado com sucesso!', 'success');
+                    loadUsers();
+                } else {
+                    showStatus(`Erro: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showStatus('Erro de conexão com o servidor', 'error');
+            }
+        }
+
+        // Mostrar mensagem de status
+        function showStatus(message, type) {
+            formStatus.innerHTML = `<div class="status ${type}">${message}</div>`;
+            setTimeout(() => {
+                formStatus.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
